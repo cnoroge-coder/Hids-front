@@ -12,10 +12,10 @@ type Severity = 'Critical' | 'High' | 'Medium' | 'Low';
 
 const alertTypes = [
     { name: 'All', icon: Bell },
-    { name: 'Firewall', icon: Shield },
-    { name: 'Login', icon: Users },
-    { name: 'File Monitoring', icon: FileWarning },
-    { name: 'Process', icon: Bell },
+    { name: 'firewall', displayName: 'Firewall', icon: Shield },
+    { name: 'login', displayName: 'Login', icon: Users },
+    { name: 'file_monitoring', displayName: 'File Monitoring', icon: FileWarning },
+    { name: 'process', displayName: 'Process', icon: Bell },
 ];
 
 const getSeverityStyling = (severity: number) => {
@@ -185,7 +185,7 @@ export default function AlertsPage() {
                     }
                 >
                     <type.icon size={16} />
-                    {type.name}
+                    {type.displayName || type.name}
                 </button>
             ))}
         </div>
