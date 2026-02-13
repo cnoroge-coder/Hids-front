@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import AgentSelector from '@/components/AgentSelector';
 import { useAgent } from '@/lib/agent-context';
+import { useWebSocket } from '@/lib/websocket-context';
+import { useWebSocket } from '@/lib/websocket-context';
 import { createClient } from '@/lib/supabase/client';
 import { Database } from '@/lib/supabase/database.types';
 import { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
@@ -12,6 +14,8 @@ type MonitoredFile = Database['public']['Tables']['monitored_files']['Row'];
 // --- MAIN FILE MONITORING PAGE COMPONENT ---
 export default function FileMonitoringPage() {
   const { selectedAgent } = useAgent();
+  const { sendCommand } = useWebSocket();
+  const { sendCommand } = useWebSocket();
   const [monitoredFiles, setMonitoredFiles] = useState<MonitoredFile[]>([]);
   const [newFilePath, setNewFilePath] = useState('');
   const supabase = createClient();
@@ -104,6 +108,13 @@ export default function FileMonitoringPage() {
 
     const { error } = await supabase.from('monitored_files').insert(newFile);
 
+    // Send command to agent to start monitoring
+    if (!error) {
+      sendCommand(selectedAgent.id, 'monitor_file', {
+        path: newFilePath.trim()
+      });
+    }
+
     if (error) {
       console.error('Error adding file:', error);
     } else {
@@ -113,6 +124,14 @@ export default function FileMonitoringPage() {
   };
 
   const handleRemoveFile = async (id: string) => {
+    // Get the file path before deleting
+    const fileToRemove = monitoredFiles.find(f => f.id === id);
+    if (fileToRemove) {
+      sendCommand(selectedAgent.id, 'unmonitor_file', {
+        path: fileToRemove.file_path
+      });
+    }
+
     const { error } = await supabase.from('monitored_files').delete().eq('id', id);
     
     if (error) {
