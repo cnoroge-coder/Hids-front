@@ -3,10 +3,11 @@ import { createContext, useContext, useState, ReactNode, useEffect } from 'react
 import { createClient } from './supabase/client';
 import { Database } from './supabase/database.types';
 
-type Agent = Database['public']['Tables']['agents']['Row'];
+type BaseAgent = Database['public']['Tables']['agents']['Row'];
 
 export type Agent = BaseAgent & {
   firewall_enabled: boolean;
+  // Add more if needed later
 };
 
 interface AgentContextType {
